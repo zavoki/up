@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作日倒计时查询工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+        }
+        
+        .input-group {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e8eef5;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .input-group:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-group h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group h3 i {
+            color: #4b6cb7;
+        }
+        
+        .date-input, .number-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e6ef;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            color: #333;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        
+        .date-input:focus, .number-input:focus {
+            border-color: #4b6cb7;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.2);
+        }
+        
+        .quick-dates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-date-btn {
+            padding: 8px 15px;
+            background-color: #e8eef5;
+            border: none;
+            border-radius: 6px;
+            color: #4b6cb7;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-date-btn:hover {
+            background-color: #4b6cb7;
+            color: white;
+        }
+        
+        .number-input-container {
+            position: relative;
+        }
+        
+        .number-input {
+            padding-right: 60px;
+        }
+        
+        .number-buttons {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .number-btn {
+            background-color: #e8eef5;
+            border: none;
+            width: 25px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #4b6cb7;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        
+        .number-btn:hover {
+            background-color: #4b6cb7;
+            color: white;
+        }
+        
+        .number-btn:first-child {
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .number-btn:last-child {
+            border-radius: 0 0 4px 4px;
+        }
+        
+        .calculate-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(to right, #4b6cb7, #3a56a4);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        
+        .calculate-btn:hover {
+            background: linear-gradient(to right, #3a56a4, #2e4685);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(75, 108, 183, 0.3);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-section {
+            background-color: #f0f7ff;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 2px dashed #b8d4ff;
+            margin-top: 20px;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .result-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 300px;
+        }
+        
+        .result-details {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 25px;
+        }
+        
+        .detail-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            min-width: 200px;
+        }
+        
+        .detail-label {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #4b6cb7;
+        }
+        
+        .calendar-preview {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .weekday {
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+            color: #4b6cb7;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .day.weekend {
+            background-color: #f0f0f0;
+            color: #aaa;
+        }
+        
+        .day.workday {
+            background-color: white;
+            color: #333;
+        }
+        
+        .day.start-day {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: 700;
+            border: 2px solid #1976d2;
+        }
+        
+        .day.end-day {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            font-weight: 700;
+            border: 2px solid #388e3c;
+        }
+        
+        .day.counted {
+            background-color: #bbdefb;
+            color: #1565c0;
+        }
+        
+        .instructions {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 40px;
+            font-size: 0.95rem;
+            color: #555;
+            border-left: 5px solid #4b6cb7;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .copy-btn {
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #3a56a4;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 25px;
+            }
+            
+            header {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .result-value {
+                font-size: 2rem;
+                min-width: 250px;
+            }
+            
+            .detail-box {
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calendar-alt"></i> 工作日倒计时查询工具</h1>
+            <p class="subtitle">输入开始日期和需要计算的工作日天数，自动计算出倒计时结束日期（自动排除周末）</p>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <h3><i class="far fa-calendar-plus"></i> 开始日期</h3>
+                    <input type="date" id="startDate" class="date-input" value="">
+                    <div class="error" id="dateError">请选择有效的开始日期</div>
+                    
+                    <div class="quick-dates">
+                        <button class="quick-date-btn" data-days="0">今天</button>
+                        <button class="quick-date-btn" data-days="1">明天</button>
+                        <button class="quick-date-btn" data-days="7">一周后</button>
+                        <button class="quick-date-btn" data-days="30">一月后</button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <h3><i class="fas fa-business-time"></i> 工作日天数</h3>
+                    <div class="number-input-container">
+                        <input type="number" id="workdays" class="number-input" min="1" max="1000" value="10">
+                        <div class="number-buttons">
+                            <button class="number-btn" id="increaseBtn">+</button>
+                            <button class="number-btn" id="decreaseBtn">-</button>
+                        </div>
+                    </div>
+                    <div class="error" id="daysError">请输入1-1000之间的有效数字</div>
+                    
+                    <div class="quick-dates">
+                        <button class="quick-date-btn" data-days-count="5">5个工作日</button>
+                        <button class="quick-date-btn" data-days-count="10">10个工作日</button>
+                        <button class="quick-date-btn" data-days-count="15">15个工作日</button>
+                        <button class="quick-date-btn" data-days-count="20">20个工作日</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="calculateBtn" class="calculate-btn">
+                <i class="fas fa-calculator"></i> 计算倒计时结束日期
+            </button>
+            
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="result-title">倒计时结束日期为：</div>
+                <div class="result-value" id="resultValue">2023-12-31</div>
+                <button class="copy-btn" id="copyBtn"><i class="far fa-copy"></i> 复制结果</button>
+                
+                <div class="result-details">
+                    <div class="detail-box">
+                        <div class="detail-label">开始日期</div>
+                        <div class="detail-value" id="startDateResult">-</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">工作日天数</div>
+                        <div class="detail-value" id="workdaysResult">-</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">实际经过天数</div>
+                        <div class="detail-value" id="totalDaysResult">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calendar-preview" id="calendarPreview" style="display: none;">
+                <div class="calendar-header">
+                    <div class="calendar-title">日期预览</div>
+                    <div id="calendarMonth">2023年11月</div>
+                </div>
+                <div class="weekdays">
+                    <div class="weekday">日</div>
+                    <div class="weekday">一</div>
+                    <div class="weekday">二</div>
+                    <div class="weekday">三</div>
+                    <div class="weekday">四</div>
+                    <div class="weekday">五</div>
+                    <div class="weekday">六</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- 日历天数将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+                <ul>
+                    <li><strong>开始日期</strong>：选择计算的起始日期，计算从该日期的下一个工作日开始。</li>
+                    <li><strong>工作日天数</strong>：输入需要倒计时计算的工作日天数（仅计算周一至周五）。</li>
+                    <li><strong>计算规则</strong>：从开始日期的下一个工作日开始计算，跳过所有周六和周日。</li>
+                    <li><strong>示例</strong>：如果开始日期是周五，那么第一个工作日是下周一；如果开始日期是周一，那么第一个工作日是周二。</li>
+                    <li>此工具不考虑法定节假日，仅排除周末。</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>工作日倒计时查询工具 &copy; 2023 | 仅排除周末，不考虑法定节假日</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认开始日期为今天
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = formattedToday;
+            
+            // 获取DOM元素
+            const startDateInput = document.getElementById('startDate');
+            const workdaysInput = document.getElementById('workdays');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultSection = document.getElementById('resultSection');
+            const resultValue = document.getElementById('resultValue');
+            const startDateResult = document.getElementById('startDateResult');
+            const workdaysResult = document.getElementById('workdaysResult');
+            const totalDaysResult = document.getElementById('totalDaysResult');
+            const copyBtn = document.getElementById('copyBtn');
+            const calendarPreview = document.getElementById('calendarPreview');
+            const calendarDays = document.getElementById('calendarDays');
+            const calendarMonth = document.getElementById('calendarMonth');
+            const increaseBtn = document.getElementById('increaseBtn');
+            const decreaseBtn = document.getElementById('decreaseBtn');
+            const dateError = document.getElementById('dateError');
+            const daysError = document.getElementById('daysError');
+            
+            // 快速日期按钮事件
+            document.querySelectorAll('.quick-date-btn[data-days]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const daysToAdd = parseInt(this.getAttribute('data-days'));
+                    const date = new Date();
+                    date.setDate(date.getDate() + daysToAdd);
+                    const formattedDate = date.toISOString().split('T')[0];
+                    startDateInput.value = formattedDate;
+                    dateError.style.display = 'none';
+                });
+            });
+            
+            // 快速工作日天数按钮事件
+            document.querySelectorAll('.quick-date-btn[data-days-count]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const daysCount = parseInt(this.getAttribute('data-days-count'));
+                    workdaysInput.value = daysCount;
+                    daysError.style.display = 'none';
+                });
+            });
+            
+            // 增加/减少工作日天数
+            increaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(workdaysInput.value) || 0;
+                if (currentValue < 1000) {
+                    workdaysInput.value = currentValue + 1;
+                    daysError.style.display = 'none';
+                }
+            });
+            
+            decreaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(workdaysInput.value) || 0;
+                if (currentValue > 1) {
+                    workdaysInput.value = currentValue - 1;
+                    daysError.style.display = 'none';
+                }
+            });
+            
+            // 计算工作日倒计时
+            calculateBtn.addEventListener('click', function() {
+                // 验证输入
+                const startDate = startDateInput.value;
+                const workdays = parseInt(workdaysInput.value);
+                
+                let isValid = true;
+                
+                if (!startDate) {
+                    dateError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    dateError.style.display = 'none';
+                }
+                
+                if (isNaN(workdays) || workdays < 1 || workdays > 1000) {
+                    daysError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    daysError.style.display = 'none';
+                }
+                
+                if (!isValid) return;
+                
+                // 计算结束日期
+                const endDate = calculateWorkdayCountdown(startDate, workdays);
+                
+                // 显示结果
+                resultSection.style.display = 'block';
+                resultValue.textContent = endDate.endDate;
+                startDateResult.textContent = formatDate(new Date(startDate));
+                workdaysResult.textContent = workdays + ' 天';
+                totalDaysResult.textContent = endDate.totalDays + ' 天';
+                
+                // 显示日历预览
+                showCalendarPreview(startDate, endDate.endDate, workdays, endDate.countedDates);
+            });
+            
+            // 复制结果按钮
+            copyBtn.addEventListener('click', function() {
+                const resultText = `开始日期：${startDateResult.textContent}，工作日天数：${workdaysResult.textContent}，结束日期：${resultValue.textContent}，实际经过天数：${totalDaysResult.textContent}`;
+                
+                navigator.clipboard.writeText(resultText)
+                    .then(() => {
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制！';
+                        copyBtn.style.backgroundColor = '#2ecc71';
+                        
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                            copyBtn.style.backgroundColor = '';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('复制失败: ', err);
+                    });
+            });
+            
+            // 计算工作日的函数
+            function calculateWorkdayCountdown(startDateStr, workdays) {
+                // 从开始日期的下一天开始计算
+                let currentDate = new Date(startDateStr);
+                currentDate.setDate(currentDate.getDate() + 1);
+                
+                let countedWorkdays = 0;
+                let totalDays = 0;
+                const countedDates = [];
+                
+                // 继续计算直到达到所需的工作日天数
+                while (countedWorkdays < workdays) {
+                    // 检查当前日期是否为工作日（周一到周五）
+                    const dayOfWeek = currentDate.getDay(); // 0 = 周日, 1 = 周一, ..., 6 = 周六
+                    
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        // 如果是工作日，添加到计数中
+                        countedWorkdays++;
+                        countedDates.push(new Date(currentDate));
+                    }
+                    
+                    // 移动到下一天
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    totalDays++;
+                }
+                
+                // 因为最后一天多加了1天，所以减回去
+                currentDate.setDate(currentDate.getDate() - 1);
+                totalDays--;
+                
+                // 格式化结束日期
+                const endDate = formatDate(currentDate);
+                
+                return {
+                    endDate,
+                    totalDays,
+                    countedDates
+                };
+            }
+            
+            // 格式化日期为YYYY-MM-DD
+            function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            // 显示日历预览
+            function showCalendarPreview(startDateStr, endDateStr, workdays, countedDates) {
+                calendarPreview.style.display = 'block';
+                
+                const startDate = new Date(startDateStr);
+                const endDate = new Date(endDateStr);
+                
+                // 确定要显示的月份（通常是开始日期所在的月份）
+                const displayDate = new Date(startDate);
+                calendarMonth.textContent = `${displayDate.getFullYear()}年${displayDate.getMonth() + 1}月`;
+                
+                // 清空日历
+                calendarDays.innerHTML = '';
+                
+                // 获取月份的第一天和最后一天
+                const firstDayOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1);
+                const lastDayOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth() + 1, 0);
+                
+                // 获取第一天是星期几（0 = 周日, 1 = 周一, ...）
+                const firstDayOfWeek = firstDayOfMonth.getDay();
+                
+                // 填充日历前的空白
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.classList.add('day');
+                    calendarDays.appendChild(emptyDay);
+                }
+                
+                // 填充日历天数
+                const daysInMonth = lastDayOfMonth.getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.classList.add('day');
+                    dayElement.textContent = day;
+                    
+                    const currentDate = new Date(displayDate.getFullYear(), displayDate.getMonth(), day);
+                    const dayOfWeek = currentDate.getDay();
+                    
+                    // 标记周末
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        dayElement.classList.add('weekend');
+                    } else {
+                        dayElement.classList.add('workday');
+                    }
+                    
+                    // 标记开始日期
+                    if (formatDate(currentDate) === startDateStr) {
+                        dayElement.classList.add('start-day');
+                        dayElement.title = "开始日期";
+                    }
+                    
+                    // 标记结束日期
+                    if (formatDate(currentDate) === endDateStr) {
+                        dayElement.classList.add('end-day');
+                        dayElement.title = "结束日期";
+                    }
+                    
+                    // 标记计算过的工作日
+                    const isCounted = countedDates.some(date => formatDate(date) === formatDate(currentDate));
+                    if (isCounted) {
+                        dayElement.classList.add('counted');
+                    }
+                    
+                    calendarDays.appendChild(dayElement);
+                }
+            }
+            
+            // 初始计算
+            calculateBtn.click();
+        });
+    </script>
+</body>
+</html>
