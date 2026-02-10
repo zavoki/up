@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工作日倒计时查询工具</title>
+    <title>工作日倒计时查询工具（含法定节假日）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -339,6 +339,17 @@
             color: #1565c0;
         }
         
+        .day.holiday {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .day.makeup-workday {
+            background-color: #fff3e0;
+            color: #f57c00;
+            font-weight: 600;
+        }
+        
         .instructions {
             background-color: #f9f9f9;
             padding: 25px;
@@ -395,6 +406,16 @@
             display: none;
         }
         
+        .year-notice {
+            background-color: #fff8e1;
+            border: 1px solid #ffd54f;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #5d4037;
+            font-size: 0.95rem;
+        }
+        
         @media (max-width: 600px) {
             .content {
                 padding: 25px;
@@ -423,15 +444,19 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-calendar-alt"></i> 工作日倒计时查询工具</h1>
-            <p class="subtitle">输入开始日期和需要计算的工作日天数，自动计算出倒计时结束日期（自动排除周末）</p>
+            <p class="subtitle">输入开始日期和需要计算的工作日天数，自动计算出倒计时结束日期（自动排除周末和2026年法定节假日）</p>
         </header>
         
         <div class="content">
+            <div class="year-notice">
+                <i class="fas fa-exclamation-circle"></i> <strong>请注意：</strong>本工具已集成2026年法定节假日与调休安排。计算2027年及以后的日期将不再准确，届时请更新节假日数据。
+            </div>
+            
             <div class="input-section">
                 <div class="input-group">
                     <h3><i class="far fa-calendar-plus"></i> 开始日期</h3>
-                    <input type="date" id="startDate" class="date-input" value="">
-                    <div class="error" id="dateError">请选择有效的开始日期</div>
+                    <input type="date" id="startDate" class="date-input" value="2026-01-01" min="2026-01-01" max="2026-12-31">
+                    <div class="error" id="dateError">请选择有效的开始日期（2026年内）</div>
                     
                     <div class="quick-dates">
                         <button class="quick-date-btn" data-days="0">今天</button>
@@ -453,6 +478,7 @@
                     <div class="error" id="daysError">请输入1-1000之间的有效数字</div>
                     
                     <div class="quick-dates">
+                        <button class="quick-date-btn" data-days-count="3">3个工作日</button>
                         <button class="quick-date-btn" data-days-count="5">5个工作日</button>
                         <button class="quick-date-btn" data-days-count="10">10个工作日</button>
                         <button class="quick-date-btn" data-days-count="15">15个工作日</button>
@@ -467,7 +493,7 @@
             
             <div class="result-section" id="resultSection" style="display: none;">
                 <div class="result-title">倒计时结束日期为：</div>
-                <div class="result-value" id="resultValue">2023-12-31</div>
+                <div class="result-value" id="resultValue">2026-01-15</div>
                 <button class="copy-btn" id="copyBtn"><i class="far fa-copy"></i> 复制结果</button>
                 
                 <div class="result-details">
@@ -489,7 +515,7 @@
             <div class="calendar-preview" id="calendarPreview" style="display: none;">
                 <div class="calendar-header">
                     <div class="calendar-title">日期预览</div>
-                    <div id="calendarMonth">2023年11月</div>
+                    <div id="calendarMonth">2026年1月</div>
                 </div>
                 <div class="weekdays">
                     <div class="weekday">日</div>
@@ -509,26 +535,21 @@
                 <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
                 <ul>
                     <li><strong>开始日期</strong>：选择计算的起始日期，计算从该日期的下一个工作日开始。</li>
-                    <li><strong>工作日天数</strong>：输入需要倒计时计算的工作日天数（仅计算周一至周五）。</li>
-                    <li><strong>计算规则</strong>：从开始日期的下一个工作日开始计算，跳过所有周六和周日。</li>
-                    <li><strong>示例</strong>：如果开始日期是周五，那么第一个工作日是下周一；如果开始日期是周一，那么第一个工作日是周二。</li>
-                    <li>此工具不考虑法定节假日，仅排除周末。</li>
+                    <li><strong>工作日天数</strong>：输入需要倒计时计算的工作日天数（仅计算工作日）。</li>
+                    <li><strong>计算规则</strong>：从开始日期的下一个工作日开始计算，跳过所有周末和2026年法定节假日，包含调休工作日。</li>
+                    <li><strong>2026年节假日</strong>：已包含元旦、春节、清明节、劳动节、端午节、中秋节、国庆节及对应调休安排。</li>
+                    <li><strong>限制</strong>：本工具仅精确支持2026年，其他年份的计算结果可能不准确。</li>
                 </ul>
             </div>
         </div>
         
         <div class="footer">
-            <p>工作日倒计时查询工具 &copy; 2023 | 仅排除周末，不考虑法定节假日</p>
+            <p>工作日倒计时查询工具 &copy; 2023 | 已集成2026年法定节假日与调休安排</p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 设置默认开始日期为今天
-            const today = new Date();
-            const formattedToday = today.toISOString().split('T')[0];
-            document.getElementById('startDate').value = formattedToday;
-            
             // 获取DOM元素
             const startDateInput = document.getElementById('startDate');
             const workdaysInput = document.getElementById('workdays');
@@ -547,103 +568,69 @@
             const dateError = document.getElementById('dateError');
             const daysError = document.getElementById('daysError');
             
-            // 快速日期按钮事件
-            document.querySelectorAll('.quick-date-btn[data-days]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const daysToAdd = parseInt(this.getAttribute('data-days'));
-                    const date = new Date();
-                    date.setDate(date.getDate() + daysToAdd);
-                    const formattedDate = date.toISOString().split('T')[0];
-                    startDateInput.value = formattedDate;
-                    dateError.style.display = 'none';
-                });
-            });
+            // 2026年法定节假日与调休数据
+            const holidayConfig = {
+                // 放假日期数组 (格式: "YYYY-MM-DD")
+                holidays: [
+                    // 元旦
+                    "2026-01-01", "2026-01-02", "2026-01-03",
+                    // 春节
+                    "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", 
+                    "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23",
+                    // 清明节
+                    "2026-04-04", "2026-04-05", "2026-04-06",
+                    // 劳动节
+                    "2026-05-01", "2026-05-02", "2026-05-03", "2026-05-04", "2026-05-05",
+                    // 端午节
+                    "2026-06-19", "2026-06-20", "2026-06-21",
+                    // 中秋节
+                    "2026-09-25", "2026-09-26", "2026-09-27",
+                    // 国庆节
+                    "2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", 
+                    "2026-10-05", "2026-10-06", "2026-10-07"
+                ],
+                // 调休工作日数组 (周末但需要上班的日期)
+                makeUpWorkdays: [
+                    "2026-01-04", // 周日上班 (元旦调休)
+                    "2026-02-14", "2026-02-28", // 周六上班 (春节调休)
+                    "2026-05-09", // 周六上班 (劳动节调休)
+                    "2026-09-20", "2026-10-10"  // 周日、周六上班 (国庆节调休)
+                ]
+            };
             
-            // 快速工作日天数按钮事件
-            document.querySelectorAll('.quick-date-btn[data-days-count]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const daysCount = parseInt(this.getAttribute('data-days-count'));
-                    workdaysInput.value = daysCount;
-                    daysError.style.display = 'none';
-                });
-            });
-            
-            // 增加/减少工作日天数
-            increaseBtn.addEventListener('click', function() {
-                let currentValue = parseInt(workdaysInput.value) || 0;
-                if (currentValue < 1000) {
-                    workdaysInput.value = currentValue + 1;
-                    daysError.style.display = 'none';
+            // 判断指定日期是否为工作日
+            function isWorkday(date) {
+                const dateStr = date.toISOString().split('T')[0];
+                const dayOfWeek = date.getDay();
+                
+                // 规则1：如果在调休工作日列表中，则是工作日
+                if (holidayConfig.makeUpWorkdays.includes(dateStr)) {
+                    return true;
                 }
-            });
-            
-            decreaseBtn.addEventListener('click', function() {
-                let currentValue = parseInt(workdaysInput.value) || 0;
-                if (currentValue > 1) {
-                    workdaysInput.value = currentValue - 1;
-                    daysError.style.display = 'none';
+                // 规则2：如果在节假日列表中，则不是工作日
+                if (holidayConfig.holidays.includes(dateStr)) {
+                    return false;
                 }
-            });
+                // 规则3：否则，按正常周一到周五判断
+                return dayOfWeek >= 1 && dayOfWeek <= 5;
+            }
+            
+            // 获取日期的类型（用于日历显示）
+            function getDateType(date) {
+                const dateStr = date.toISOString().split('T')[0];
+                
+                if (holidayConfig.makeUpWorkdays.includes(dateStr)) {
+                    return "makeup-workday";
+                } else if (holidayConfig.holidays.includes(dateStr)) {
+                    return "holiday";
+                } else if (date.getDay() === 0 || date.getDay() === 6) {
+                    return "weekend";
+                } else {
+                    return "workday";
+                }
+            }
             
             // 计算工作日倒计时
-            calculateBtn.addEventListener('click', function() {
-                // 验证输入
-                const startDate = startDateInput.value;
-                const workdays = parseInt(workdaysInput.value);
-                
-                let isValid = true;
-                
-                if (!startDate) {
-                    dateError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    dateError.style.display = 'none';
-                }
-                
-                if (isNaN(workdays) || workdays < 1 || workdays > 1000) {
-                    daysError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    daysError.style.display = 'none';
-                }
-                
-                if (!isValid) return;
-                
-                // 计算结束日期
-                const endDate = calculateWorkdayCountdown(startDate, workdays);
-                
-                // 显示结果
-                resultSection.style.display = 'block';
-                resultValue.textContent = endDate.endDate;
-                startDateResult.textContent = formatDate(new Date(startDate));
-                workdaysResult.textContent = workdays + ' 天';
-                totalDaysResult.textContent = endDate.totalDays + ' 天';
-                
-                // 显示日历预览
-                showCalendarPreview(startDate, endDate.endDate, workdays, endDate.countedDates);
-            });
-            
-            // 复制结果按钮
-            copyBtn.addEventListener('click', function() {
-                const resultText = `开始日期：${startDateResult.textContent}，工作日天数：${workdaysResult.textContent}，结束日期：${resultValue.textContent}，实际经过天数：${totalDaysResult.textContent}`;
-                
-                navigator.clipboard.writeText(resultText)
-                    .then(() => {
-                        const originalText = copyBtn.innerHTML;
-                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制！';
-                        copyBtn.style.backgroundColor = '#2ecc71';
-                        
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalText;
-                            copyBtn.style.backgroundColor = '';
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('复制失败: ', err);
-                    });
-            });
-            
-            // 计算工作日的函数
             function calculateWorkdayCountdown(startDateStr, workdays) {
                 // 从开始日期的下一天开始计算
                 let currentDate = new Date(startDateStr);
@@ -653,23 +640,16 @@
                 let totalDays = 0;
                 const countedDates = [];
                 
-                // 继续计算直到达到所需的工作日天数
                 while (countedWorkdays < workdays) {
-                    // 检查当前日期是否为工作日（周一到周五）
-                    const dayOfWeek = currentDate.getDay(); // 0 = 周日, 1 = 周一, ..., 6 = 周六
-                    
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                        // 如果是工作日，添加到计数中
+                    if (isWorkday(currentDate)) {
                         countedWorkdays++;
                         countedDates.push(new Date(currentDate));
                     }
-                    
-                    // 移动到下一天
                     currentDate.setDate(currentDate.getDate() + 1);
                     totalDays++;
                 }
                 
-                // 因为最后一天多加了1天，所以减回去
+                // 循环结束后，currentDate多加了1天，需要减回去得到准确的结束日期
                 currentDate.setDate(currentDate.getDate() - 1);
                 totalDays--;
                 
@@ -727,14 +707,10 @@
                     dayElement.textContent = day;
                     
                     const currentDate = new Date(displayDate.getFullYear(), displayDate.getMonth(), day);
-                    const dayOfWeek = currentDate.getDay();
+                    const dateType = getDateType(currentDate);
                     
-                    // 标记周末
-                    if (dayOfWeek === 0 || dayOfWeek === 6) {
-                        dayElement.classList.add('weekend');
-                    } else {
-                        dayElement.classList.add('workday');
-                    }
+                    // 根据日期类型添加相应样式
+                    dayElement.classList.add(dateType);
                     
                     // 标记开始日期
                     if (formatDate(currentDate) === startDateStr) {
@@ -750,13 +726,129 @@
                     
                     // 标记计算过的工作日
                     const isCounted = countedDates.some(date => formatDate(date) === formatDate(currentDate));
-                    if (isCounted) {
+                    if (isCounted && dateType !== 'holiday' && dateType !== 'weekend') {
                         dayElement.classList.add('counted');
+                    }
+                    
+                    // 添加详细提示
+                    if (dateType === 'holiday') {
+                        dayElement.title = "法定节假日";
+                    } else if (dateType === 'makeup-workday') {
+                        dayElement.title = "调休工作日";
+                    } else if (dateType === 'weekend') {
+                        dayElement.title = "周末";
                     }
                     
                     calendarDays.appendChild(dayElement);
                 }
             }
+            
+            // 快速日期按钮事件
+            document.querySelectorAll('.quick-date-btn[data-days]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const daysToAdd = parseInt(this.getAttribute('data-days'));
+                    const date = new Date('2026-01-01'); // 从2026年开始计算
+                    date.setDate(date.getDate() + daysToAdd);
+                    
+                    // 确保日期在2026年内
+                    if (date.getFullYear() !== 2026) {
+                        dateError.style.display = 'block';
+                        dateError.textContent = '快捷日期超出2026年范围，请手动选择日期';
+                        return;
+                    }
+                    
+                    const formattedDate = date.toISOString().split('T')[0];
+                    startDateInput.value = formattedDate;
+                    dateError.style.display = 'none';
+                });
+            });
+            
+            // 快速工作日天数按钮事件
+            document.querySelectorAll('.quick-date-btn[data-days-count]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const daysCount = parseInt(this.getAttribute('data-days-count'));
+                    workdaysInput.value = daysCount;
+                    daysError.style.display = 'none';
+                });
+            });
+            
+            // 增加/减少工作日天数
+            increaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(workdaysInput.value) || 0;
+                if (currentValue < 1000) {
+                    workdaysInput.value = currentValue + 1;
+                    daysError.style.display = 'none';
+                }
+            });
+            
+            decreaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(workdaysInput.value) || 0;
+                if (currentValue > 1) {
+                    workdaysInput.value = currentValue - 1;
+                    daysError.style.display = 'none';
+                }
+            });
+            
+            // 计算按钮点击事件
+            calculateBtn.addEventListener('click', function() {
+                // 验证输入
+                const startDate = startDateInput.value;
+                const workdays = parseInt(workdaysInput.value);
+                
+                let isValid = true;
+                
+                // 检查日期是否在2026年
+                const selectedDate = new Date(startDate);
+                if (!startDate || selectedDate.getFullYear() !== 2026) {
+                    dateError.style.display = 'block';
+                    dateError.textContent = '请选择2026年内的有效开始日期';
+                    isValid = false;
+                } else {
+                    dateError.style.display = 'none';
+                }
+                
+                if (isNaN(workdays) || workdays < 1 || workdays > 1000) {
+                    daysError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    daysError.style.display = 'none';
+                }
+                
+                if (!isValid) return;
+                
+                // 计算结束日期
+                const endDate = calculateWorkdayCountdown(startDate, workdays);
+                
+                // 显示结果
+                resultSection.style.display = 'block';
+                resultValue.textContent = endDate.endDate;
+                startDateResult.textContent = formatDate(new Date(startDate));
+                workdaysResult.textContent = workdays + ' 天';
+                totalDaysResult.textContent = endDate.totalDays + ' 天';
+                
+                // 显示日历预览
+                showCalendarPreview(startDate, endDate.endDate, workdays, endDate.countedDates);
+            });
+            
+            // 复制结果按钮
+            copyBtn.addEventListener('click', function() {
+                const resultText = `开始日期：${startDateResult.textContent}，工作日天数：${workdaysResult.textContent}，结束日期：${resultValue.textContent}，实际经过天数：${totalDaysResult.textContent}`;
+                
+                navigator.clipboard.writeText(resultText)
+                    .then(() => {
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制！';
+                        copyBtn.style.backgroundColor = '#2ecc71';
+                        
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                            copyBtn.style.backgroundColor = '';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('复制失败: ', err);
+                    });
+            });
             
             // 初始计算
             calculateBtn.click();
