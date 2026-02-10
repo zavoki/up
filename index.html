@@ -745,23 +745,50 @@
             
             // 快速日期按钮事件
             document.querySelectorAll('.quick-date-btn[data-days]').forEach(button => {
-                button.addEventListener('click', function() {
-                    const daysToAdd = parseInt(this.getAttribute('data-days'));
-                    const date = new Date('2026-01-01'); // 从2026年开始计算
-                    date.setDate(date.getDate() + daysToAdd);
-                    
-                    // 确保日期在2026年内
-                    if (date.getFullYear() !== 2026) {
-                        dateError.style.display = 'block';
-                        dateError.textContent = '快捷日期超出2026年范围，请手动选择日期';
-                        return;
-                    }
-                    
-                    const formattedDate = date.toISOString().split('T')[0];
-                    startDateInput.value = formattedDate;
-                    dateError.style.display = 'none';
-                });
-            });
+    button.addEventListener('click', function() {
+        const daysToAdd = parseInt(this.getAttribute('data-days'));
+        const realToday = new Date(); // 获取真实的系统日期
+        let targetDate = new Date(realToday);
+        targetDate.setDate(realToday.getDate() + daysToAdd);
+        
+        // 检查目标日期是否在2026年
+        if (targetDate.getFullYear() === 2026) {
+            // 如果在2026年，直接使用
+            const formattedDate = targetDate.toISOString().split('T')[0];
+            startDateInput.value = formattedDate;
+            dateError.style.display = 'none';
+            
+            // 如果之前有提示，隐藏它
+            const notice = document.querySelector('.quick-date-notice');
+            if (notice) notice.style.display = 'none';
+        } else {
+            // 如果不在2026年，重置到2026-01-01，并显示友好提示
+            startDateInput.value = '2026-01-01';
+            
+            // 显示一个临时提示信息
+            let notice = document.querySelector('.quick-date-notice');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.className = 'quick-date-notice';
+                notice.style.cssText = `
+                    background-color: #fff8e1;
+                    border-left: 4px solid #ffb300;
+                    padding: 10px 15px;
+                    margin-top: 10px;
+                    border-radius: 4px;
+                    font-size: 0.9rem;
+                    color: #5d4037;
+                `;
+                // 插入到按钮组后面
+                this.parentNode.appendChild(notice);
+            }
+            notice.innerHTML = `<i class="fas fa-info-circle"></i> 当前真实日期（${formatDate(targetDate)}）不在2026年内。已为您设为2026-01-01，您可手动调整。`;
+            notice.style.display = 'block';
+            
+            dateError.style.display = 'none';
+        }
+    });
+});
             
             // 快速工作日天数按钮事件
             document.querySelectorAll('.quick-date-btn[data-days-count]').forEach(button => {
@@ -856,3 +883,4 @@
     </script>
 </body>
 </html>
+
